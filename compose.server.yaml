@@ -1,0 +1,20 @@
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      APP_DOMAIN: "${APP_DOMAIN:?Set APP_DOMAIN in the server .env}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./docker/caddy:/etc/caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

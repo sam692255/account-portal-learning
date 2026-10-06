@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: login_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the project root .env}"
+      DB_USER: "${DB_USER:-login_app_user}"
+      DB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in the project root .env}"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres-init/000_create_app_role.sql:/docker-entrypoint-initdb.d/000_create_app_role.sql:ro
+      - ./apps/api/migrations/001_create_users.sql:/docker-entrypoint-initdb.d/001_create_users.sql:ro
+      - ./apps/api/migrations/002_create_user_sessions.sql:/docker-entrypoint-initdb.d/002_create_user_sessions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d login_app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: login_app
+      DB_USER: "${DB_USER:-login_app_user}"
+      DB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in the project root .env}"
+    ports:
+      - "127.0.0.1:3001:3000"
+
+volumes:
+  postgres_data:
