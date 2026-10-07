@@ -18,4 +18,4 @@ CREATE TABLE public.user_sessions (
 CREATE INDEX user_sessions_user_expires_idx
   ON public.user_sessions (user_id, expires_at);
 
-ALTER TABLE public.user_sessions OWNER TO login_app_user;
+GRANT SELECT, INSERT, UPDATE ON TABLE public.user_sessions TO login_app_user;

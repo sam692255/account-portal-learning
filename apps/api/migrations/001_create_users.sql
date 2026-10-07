@@ -14,4 +14,6 @@ CREATE UNIQUE INDEX users_email_lower_unique
 CREATE UNIQUE INDEX users_mobile_unique
   ON public.users (mobile_number);
 
-ALTER TABLE public.users OWNER TO login_app_user;
+GRANT USAGE ON SCHEMA public TO login_app_user;
+GRANT SELECT, INSERT ON TABLE public.users TO login_app_user;
+GRANT USAGE, SELECT ON SEQUENCE public.users_id_seq TO login_app_user;

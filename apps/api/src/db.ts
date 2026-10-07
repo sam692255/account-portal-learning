@@ -23,4 +23,5 @@ export const pool = new Pool({
   database: getEnv("DB_NAME"),
   user: getEnv("DB_USER"),
   password: getEnv("DB_PASSWORD"),
+  ssl: process.env.DB_SSL === "true" ? {} : false,
 });
